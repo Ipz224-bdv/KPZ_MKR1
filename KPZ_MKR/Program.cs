@@ -10,7 +10,7 @@ namespace LightHTML_System
         static void Main()
         {
             // =========================================================================
-            // БЛОК 1: СТВОРЕННЯ СКЛАДНОЇ HTML-СТРУКТУРИ ТА ВІДКРИТТЯ В БРАУЗЕРІ
+            // КРОК 1: СТВОРЕННЯ СКЛАДНОЇ HTML-СТРУКТУРИ ТА ВІДКРИТТЯ В БРАУЗЕРІ
             // =========================================================================
             Console.WriteLine("--- КРОК 1: ГЕНЕРАЦІЯ ТА ВІДКРИТТЯ HTML-ФАЙЛУ ---");
 
@@ -40,16 +40,15 @@ namespace LightHTML_System
 
             cardContainer.AddChild(table);
 
-            // Збереження та запуск
             string finalHtml = cardContainer.OuterHTML;
             string filePath = "result.html";
             File.WriteAllText(filePath, finalHtml);
 
-            Console.WriteLine($"HTML-файл '{filePath}' створено.");
+            Console.WriteLine($"HTML-файл '{filePath}' успішно створено.");
             try
             {
                 Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
-                Console.WriteLine("Браузер відкрито автоматично.");
+                Console.WriteLine("Результат відкрито у браузері.");
             }
             catch { Console.WriteLine("Не вдалося відкрити браузер автоматично."); }
 
@@ -57,7 +56,7 @@ namespace LightHTML_System
 
 
             // =========================================================================
-            // БЛОК 2: ТЕСТУВАННЯ ІТЕРАТОРІВ (ОБХІД ДЕРЕВА)
+            // КРОК 2: ТЕСТУВАННЯ ІТЕРАТОРІВ (ОБХІД ДЕРЕВА)
             // =========================================================================
             Console.WriteLine("--- КРОК 2: ОБХІД ДЕРЕВА (ITERATORS) ---");
 
@@ -77,7 +76,7 @@ namespace LightHTML_System
 
 
             // =========================================================================
-            // БЛОК 3: ПАТЕРН КОМАНДА (UNDO/REDO)
+            // КРОК 3: ПАТЕРН КОМАНДА (UNDO/REDO)
             // =========================================================================
             Console.WriteLine("--- КРОК 3: ПАТЕРН КОМАНДА (UNDO/REDO) ---");
 
@@ -89,12 +88,10 @@ namespace LightHTML_System
 
             var commandHistory = new Stack<ICommand>();
 
-            // Додаємо перший клас
             ICommand cmd1 = new AddCssClassCommand(button, "btn-primary");
             cmd1.Execute();
             commandHistory.Push(cmd1);
 
-            // Додаємо другий клас
             ICommand cmd2 = new AddCssClassCommand(button, "active");
             cmd2.Execute();
             commandHistory.Push(cmd2);
@@ -102,18 +99,44 @@ namespace LightHTML_System
             Console.WriteLine("\nПісля додавання класів 'btn-primary' та 'active':");
             Console.WriteLine(button.OuterHTML);
 
-            // Скасування останньої дії
             if (commandHistory.Count > 0)
             {
                 Console.WriteLine("\nВиконуємо UNDO...");
                 var lastCommand = commandHistory.Pop();
                 lastCommand.Undo();
 
-                Console.WriteLine("Стан після скасування:");
+                Console.WriteLine("Стан кнопки після скасування останньої команди:");
                 Console.WriteLine(button.OuterHTML);
             }
 
-            Console.WriteLine("\nРоботу завершено. Натисніть Enter для виходу.");
+            Console.WriteLine("\n" + new string('=', 60) + "\n");
+
+
+            // =========================================================================
+            // КРОК 4: ПАТЕРН СТЕЙТ (STATE)
+            // =========================================================================
+            Console.WriteLine("--- КРОК 4: ПАТЕРН СТЕЙТ (STATE) ---");
+
+            var alertBox = new LightElementNode("div", DisplayType.Block, ClosingType.Paired);
+            alertBox.AddCssClass("alert");
+            alertBox.AddCssClass("alert-danger");
+
+            var message = new LightTextNode("Увага! Втрачено з'єднання з сервером.");
+            alertBox.AddChild(message);
+
+            Console.WriteLine("\n1. Нормальний стан (NormalState):");
+            Console.WriteLine(alertBox.OuterHTML);
+
+            Console.WriteLine("\n2. Змінюємо стан на Прихований (HiddenState):");
+            alertBox.SetState(new HiddenState());
+            Console.WriteLine("Результат рендеру: " + alertBox.OuterHTML); // Порожньо або коментар
+
+            Console.WriteLine("\n3. Повертаємо стан на Нормальний (NormalState):");
+            alertBox.SetState(new NormalState());
+            Console.WriteLine(alertBox.OuterHTML);
+
+            Console.WriteLine("\n" + new string('=', 60));
+            Console.WriteLine("Всі демонстрації завершено. Натисніть Enter для виходу.");
             Console.ReadLine();
         }
 
