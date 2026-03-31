@@ -81,5 +81,52 @@ namespace LightHTML_System
                 return sb.ToString();
             }
         }
+        // --- ПАТЕРН ІТЕРАТОР ---
+
+        // 1. Обхід в глибину (Depth-First Search - DFS)
+        public IEnumerable<LightNode> GetDepthFirstIterator()
+        {
+            // Повертаємо поточний вузол
+            yield return this;
+
+            // Рекурсивно обходимо всіх дітей
+            foreach (var child in _children)
+            {
+                if (child is LightElementNode elementNode)
+                {
+                    foreach (var nestedChild in elementNode.GetDepthFirstIterator())
+                    {
+                        yield return nestedChild;
+                    }
+                }
+                else
+                {
+                    yield return child; // Повертаємо текстовий вузол
+                }
+            }
+        }
+
+        // 2. Обхід в ширину (Breadth-First Search - BFS)
+        public IEnumerable<LightNode> GetBreadthFirstIterator()
+        {
+            // Використовуємо чергу для обходу рівнями
+            var queue = new Queue<LightNode>();
+            queue.Enqueue(this);
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                yield return current;
+
+                // Якщо це елемент, додаємо його дітей в чергу
+                if (current is LightElementNode elementNode)
+                {
+                    foreach (var child in elementNode._children)
+                    {
+                        queue.Enqueue(child);
+                    }
+                }
+            }
+        }
     }
 }
