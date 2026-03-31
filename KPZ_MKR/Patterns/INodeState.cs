@@ -1,4 +1,4 @@
-﻿namespace LightHTML_System
+﻿namespace KPZ_MKR.Patterns
 {
     public interface INodeState
     {

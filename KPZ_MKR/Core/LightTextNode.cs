@@ -1,4 +1,6 @@
-﻿namespace LightHTML_System
+﻿using KPZ_MKR.Patterns;
+
+namespace KPZ_MKR.Core
 {
     public class LightTextNode : LightNode
     {
@@ -15,7 +17,11 @@
         // --- РЕАЛІЗАЦІЯ ХУКА (ШАБЛОННИЙ МЕТОД) ---
         protected override void OnTextRendered()
         {
-            System.Console.WriteLine($"[Hook - LightTextNode]: Відмальовано текст '{_text}'");
+            Console.WriteLine($"[Hook - LightTextNode]: Відмальовано текст '{_text}'");
+        }
+        public override void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

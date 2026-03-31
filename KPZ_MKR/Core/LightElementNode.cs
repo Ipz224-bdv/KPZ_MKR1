@@ -1,8 +1,10 @@
-﻿using System;
+﻿using KPZ_MKR.Infrastructure;
+using KPZ_MKR.Patterns;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace LightHTML_System
+namespace KPZ_MKR.Core
 {
     public class LightElementNode : LightNode
     {
@@ -147,20 +149,31 @@ namespace LightHTML_System
 
         protected override void OnCreated()
         {
-            System.Console.WriteLine($"[Hook - LightElementNode]: Створено вузол <{TagName}>");
+            Console.WriteLine($"[Hook - LightElementNode]: Створено вузол <{TagName}>");
         }
 
         protected override void OnStylesApplied()
         {
             if (_cssClasses.Count > 0)
             {
-                System.Console.WriteLine($"[Hook - LightElementNode]: До <{TagName}> застосовано класи: {string.Join(", ", _cssClasses)}");
+                Console.WriteLine($"[Hook - LightElementNode]: До <{TagName}> застосовано класи: {string.Join(", ", _cssClasses)}");
             }
         }
 
         protected override void OnRendered()
         {
-            System.Console.WriteLine($"[Hook - LightElementNode]: Завершено рендеринг вузла <{TagName}>");
+            Console.WriteLine($"[Hook - LightElementNode]: Завершено рендеринг вузла <{TagName}>");
         }
+        public override void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this); // Елемент приймає відвідувача
+
+            // Відвідувач йде далі по всьому дереву дочірніх елементів
+            foreach (var child in _children)
+            {
+                child.Accept(visitor);
+            }
+        }
+
     }
 }

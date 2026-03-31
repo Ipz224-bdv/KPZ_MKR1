@@ -1,4 +1,6 @@
-﻿namespace LightHTML_System
+﻿using KPZ_MKR.Core;
+
+namespace KPZ_MKR.Patterns
 {
     public class AddCssClassCommand : ICommand
     {
