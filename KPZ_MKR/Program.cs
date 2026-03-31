@@ -8,10 +8,10 @@ namespace LightHTML_System
     {
         static void Main()
         {
-            // --- 1. СТВОРЕННЯ HTML СТРУКТУРИ ---
+            // --- 1. СТВОРЕННЯ HTML СТРУКТУРИ (Кіберспортивна картка) ---
 
             var cardContainer = new LightElementNode("div", DisplayType.Block, ClosingType.Paired);
-            // Додамо трохи вбудованих стилів (CSS), щоб воно виглядало гарно в браузері
+            // Додаємо стилі для гарного вигляду
             cardContainer.AddCssClass("esports-card\" style=\"font-family: Arial; padding: 20px; border: 2px solid #333; width: 400px; border-radius: 10px; background-color: #f9f9f9; text-align: center;");
 
             var header = new LightElementNode("h2", DisplayType.Block, ClosingType.Paired);
@@ -21,6 +21,7 @@ namespace LightHTML_System
             var table = new LightElementNode("table", DisplayType.Block, ClosingType.Paired);
             table.AddCssClass("scoreboard\" style=\"width: 100%; margin-top: 15px; border-collapse: collapse;");
 
+            // Заголовок таблиці
             var trHead = new LightElementNode("tr", DisplayType.Block, ClosingType.Paired);
 
             var th1 = new LightElementNode("th", DisplayType.Inline, ClosingType.Paired);
@@ -35,6 +36,7 @@ namespace LightHTML_System
             trHead.AddChild(th3);
             table.AddChild(trHead);
 
+            // Тіло таблиці з результатом
             var trBody = new LightElementNode("tr", DisplayType.Block, ClosingType.Paired);
 
             var td1 = new LightElementNode("td", DisplayType.Inline, ClosingType.Paired);
@@ -53,22 +55,19 @@ namespace LightHTML_System
 
             cardContainer.AddChild(table);
 
-            // Отримуємо фінальний HTML рядок
-            string finalHtml = cardContainer.OuterHTML;
+            // --- 2. ГЕНЕРАЦІЯ ТА ВІДКРИТТЯ ФАЙЛУ ---
 
-            // --- 2. ВИВЕДЕННЯ ТА "ВИКОНАННЯ" РЕЗУЛЬТАТУ ---
+            string finalHtml = cardContainer.OuterHTML;
 
             Console.WriteLine("=== Згенерована HTML-розмітка ===");
             Console.WriteLine(finalHtml);
 
-            // Створюємо HTML файл
             string filePath = "result.html";
             File.WriteAllText(filePath, finalHtml);
 
             Console.WriteLine($"\nФайл {filePath} успішно створено!");
-            Console.WriteLine("Відкриваємо результат у браузері...");
 
-            // Автоматично відкриваємо створений файл у браузері за замовчуванням
+            // Спроба відкрити браузер
             try
             {
                 Process.Start(new ProcessStartInfo
@@ -79,11 +78,36 @@ namespace LightHTML_System
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Не вдалося автоматично відкрити браузер. Помилка: {ex.Message}");
-                Console.WriteLine($"Знайдіть файл {filePath} у папці з проєктом та відкрийте його вручну.");
+                Console.WriteLine($"Не вдалося відкрити браузер: {ex.Message}");
             }
 
-            Console.ReadLine(); // Щоб консоль не закрилася миттєво
+            Console.WriteLine("\n" + new string('-', 30));
+
+            // --- 3. ТЕСТУВАННЯ ІТЕРАТОРІВ НА СТВОРЕНІЙ КАРТЦІ ---
+
+            Console.WriteLine("=== Обхід побудованого дерева в глибину (Depth-First) ===");
+            foreach (var node in cardContainer.GetDepthFirstIterator())
+            {
+                PrintNodeInfo(node);
+            }
+
+            Console.WriteLine("\n=== Обхід побудованого дерева в ширину (Breadth-First) ===");
+            foreach (var node in cardContainer.GetBreadthFirstIterator())
+            {
+                PrintNodeInfo(node);
+            }
+
+            Console.WriteLine("\nНатисніть Enter, щоб вийти...");
+            Console.ReadLine();
+        }
+
+        // Допоміжний метод для виведення інформації про вузол
+        static void PrintNodeInfo(LightNode node)
+        {
+            if (node is LightElementNode el)
+                Console.WriteLine($"Тег: <{el.TagName}>");
+            else if (node is LightTextNode txt)
+                Console.WriteLine($"  Текст: {txt.InnerHTML.Trim()}");
         }
     }
 }
