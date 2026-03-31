@@ -143,5 +143,24 @@ namespace LightHTML_System
                 }
             }
         }
+        // --- РЕАЛІЗАЦІЯ ХУКІВ (ШАБЛОННИЙ МЕТОД) ---
+
+        protected override void OnCreated()
+        {
+            System.Console.WriteLine($"[Hook - LightElementNode]: Створено вузол <{TagName}>");
+        }
+
+        protected override void OnStylesApplied()
+        {
+            if (_cssClasses.Count > 0)
+            {
+                System.Console.WriteLine($"[Hook - LightElementNode]: До <{TagName}> застосовано класи: {string.Join(", ", _cssClasses)}");
+            }
+        }
+
+        protected override void OnRendered()
+        {
+            System.Console.WriteLine($"[Hook - LightElementNode]: Завершено рендеринг вузла <{TagName}>");
+        }
     }
 }

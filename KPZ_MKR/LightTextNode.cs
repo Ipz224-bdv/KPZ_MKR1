@@ -11,5 +11,11 @@
 
         public override string InnerHTML => _text;
         public override string OuterHTML => _text;
+
+        // --- РЕАЛІЗАЦІЯ ХУКА (ШАБЛОННИЙ МЕТОД) ---
+        protected override void OnTextRendered()
+        {
+            System.Console.WriteLine($"[Hook - LightTextNode]: Відмальовано текст '{_text}'");
+        }
     }
 }

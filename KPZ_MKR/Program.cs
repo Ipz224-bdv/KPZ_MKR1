@@ -9,9 +9,6 @@ namespace LightHTML_System
     {
         static void Main()
         {
-            // =========================================================================
-            // КРОК 1: СТВОРЕННЯ СКЛАДНОЇ HTML-СТРУКТУРИ ТА ВІДКРИТТЯ В БРАУЗЕРІ
-            // =========================================================================
             Console.WriteLine("--- КРОК 1: ГЕНЕРАЦІЯ ТА ВІДКРИТТЯ HTML-ФАЙЛУ ---");
 
             var cardContainer = new LightElementNode("div", DisplayType.Block, ClosingType.Paired);
@@ -40,7 +37,7 @@ namespace LightHTML_System
 
             cardContainer.AddChild(table);
 
-            string finalHtml = cardContainer.OuterHTML;
+            string finalHtml = cardContainer.Render();
             string filePath = "result.html";
             File.WriteAllText(filePath, finalHtml);
 
@@ -52,12 +49,8 @@ namespace LightHTML_System
             }
             catch { Console.WriteLine("Не вдалося відкрити браузер автоматично."); }
 
-            Console.WriteLine("\n" + new string('=', 60) + "\n");
+            Divider();
 
-
-            // =========================================================================
-            // КРОК 2: ТЕСТУВАННЯ ІТЕРАТОРІВ (ОБХІД ДЕРЕВА)
-            // =========================================================================
             Console.WriteLine("--- КРОК 2: ОБХІД ДЕРЕВА (ITERATORS) ---");
 
             Console.WriteLine("\n[Depth-First Search - В глибину]:");
@@ -72,32 +65,28 @@ namespace LightHTML_System
                 PrintNodeInfo(node);
             }
 
-            Console.WriteLine("\n" + new string('=', 60) + "\n");
+            Divider();
 
-
-            // =========================================================================
-            // КРОК 3: ПАТЕРН КОМАНДА (UNDO/REDO)
-            // =========================================================================
             Console.WriteLine("--- КРОК 3: ПАТЕРН КОМАНДА (UNDO/REDO) ---");
 
-            var button = new LightElementNode("button", DisplayType.Inline, ClosingType.Paired);
-            button.AddChild(new LightTextNode("Click me!"));
+            var btnCmd = new LightElementNode("button", DisplayType.Inline, ClosingType.Paired);
+            btnCmd.AddChild(new LightTextNode("Click me!"));
 
             Console.WriteLine("\nПочаткова кнопка:");
-            Console.WriteLine(button.OuterHTML);
+            Console.WriteLine(btnCmd.OuterHTML);
 
             var commandHistory = new Stack<ICommand>();
 
-            ICommand cmd1 = new AddCssClassCommand(button, "btn-primary");
+            ICommand cmd1 = new AddCssClassCommand(btnCmd, "btn-primary");
             cmd1.Execute();
             commandHistory.Push(cmd1);
 
-            ICommand cmd2 = new AddCssClassCommand(button, "active");
+            ICommand cmd2 = new AddCssClassCommand(btnCmd, "active");
             cmd2.Execute();
             commandHistory.Push(cmd2);
 
             Console.WriteLine("\nПісля додавання класів 'btn-primary' та 'active':");
-            Console.WriteLine(button.OuterHTML);
+            Console.WriteLine(btnCmd.OuterHTML);
 
             if (commandHistory.Count > 0)
             {
@@ -105,39 +94,56 @@ namespace LightHTML_System
                 var lastCommand = commandHistory.Pop();
                 lastCommand.Undo();
 
-                Console.WriteLine("Стан кнопки після скасування останньої команди:");
-                Console.WriteLine(button.OuterHTML);
+                Console.WriteLine("Стан після скасування останньої команди:");
+                Console.WriteLine(btnCmd.OuterHTML);
             }
 
-            Console.WriteLine("\n" + new string('=', 60) + "\n");
+            Divider();
 
-
-            // =========================================================================
-            // КРОК 4: ПАТЕРН СТЕЙТ (STATE)
-            // =========================================================================
             Console.WriteLine("--- КРОК 4: ПАТЕРН СТЕЙТ (STATE) ---");
 
             var alertBox = new LightElementNode("div", DisplayType.Block, ClosingType.Paired);
-            alertBox.AddCssClass("alert");
-            alertBox.AddCssClass("alert-danger");
+            alertBox.AddCssClass("alert alert-danger");
+            alertBox.AddChild(new LightTextNode("Втрачено з'єднання!"));
 
-            var message = new LightTextNode("Увага! Втрачено з'єднання з сервером.");
-            alertBox.AddChild(message);
-
-            Console.WriteLine("\n1. Нормальний стан (NormalState):");
+            Console.WriteLine("\n1. Нормальний стан:");
             Console.WriteLine(alertBox.OuterHTML);
 
-            Console.WriteLine("\n2. Змінюємо стан на Прихований (HiddenState):");
+            Console.WriteLine("\n2. Змінюємо стан на HiddenState...");
             alertBox.SetState(new HiddenState());
-            Console.WriteLine("Результат рендеру: " + alertBox.OuterHTML); // Порожньо або коментар
+            Console.WriteLine("Результат рендеру: " + alertBox.OuterHTML);
 
-            Console.WriteLine("\n3. Повертаємо стан на Нормальний (NormalState):");
+            Console.WriteLine("\n3. Повертаємо NormalState...");
             alertBox.SetState(new NormalState());
             Console.WriteLine(alertBox.OuterHTML);
 
+            Divider();
+
+            Console.WriteLine("--- КРОК 5: ШАБЛОННИЙ МЕТОД (LIFECYCLE HOOKS) ---");
+
+            var saveBtn = new LightElementNode("button", DisplayType.Inline, ClosingType.Paired);
+            saveBtn.AddCssClass("btn btn-success");
+            var text = new LightTextNode("Зберегти");
+
+            Console.WriteLine("--- Виклик Render() для тексту ---");
+            text.Render();
+
+            saveBtn.AddChild(text);
+
+            Console.WriteLine("\n--- Виклик Render() для кнопки ---");
+            string btnHtml = saveBtn.Render();
+
+            Console.WriteLine("\n=== Підсумковий HTML ===");
+            Console.WriteLine(btnHtml);
+
             Console.WriteLine("\n" + new string('=', 60));
-            Console.WriteLine("Всі демонстрації завершено. Натисніть Enter для виходу.");
+            Console.WriteLine("Демонстрацію завершено!");
             Console.ReadLine();
+        }
+
+        static void Divider()
+        {
+            Console.WriteLine("\n" + new string('=', 60) + "\n");
         }
 
         static void PrintNodeInfo(LightNode node)
