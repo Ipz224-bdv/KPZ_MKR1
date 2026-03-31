@@ -128,5 +128,12 @@ namespace LightHTML_System
                 }
             }
         }
+        public void RemoveCssClass(string cssClass)
+        {
+            if (_cssClasses.Contains(cssClass))
+            {
+                _cssClasses.Remove(cssClass);
+            }
+        }
     }
 }
