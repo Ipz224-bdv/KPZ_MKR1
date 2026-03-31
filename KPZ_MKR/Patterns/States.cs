@@ -1,4 +1,4 @@
-﻿namespace LightHTML_System
+﻿namespace KPZ_MKR.Patterns
 {
     // 1. Нормальний стан: просто повертає HTML як є
     public class NormalState : INodeState

@@ -1,7 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Diagnostics;
+﻿using KPZ_MKR.Core;
+using KPZ_MKR.Infrastructure;
+using KPZ_MKR.Patterns;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 
 namespace LightHTML_System
 {
@@ -135,6 +138,40 @@ namespace LightHTML_System
 
             Console.WriteLine("\n=== Підсумковий HTML ===");
             Console.WriteLine(btnHtml);
+
+            Divider();
+
+            Console.WriteLine("--- КРОК 6: ПАТЕРН ВІДВІДУВАЧ (VISITOR) ---");
+
+            var body = new LightElementNode("body", DisplayType.Block, ClosingType.Paired);
+            var h1 = new LightElementNode("h1", DisplayType.Block, ClosingType.Paired);
+            h1.AddChild(new LightTextNode("Головний заголовок сторінки"));
+
+            var ul = new LightElementNode("ul", DisplayType.Block, ClosingType.Paired);
+            var li1 = new LightElementNode("li", DisplayType.Block, ClosingType.Paired);
+            li1.AddChild(new LightTextNode("Перший пункт"));
+            var li2 = new LightElementNode("li", DisplayType.Block, ClosingType.Paired);
+            li2.AddChild(new LightTextNode("Другий пункт"));
+
+            ul.AddChild(li1);
+            ul.AddChild(li2);
+            body.AddChild(h1);
+            body.AddChild(ul);
+
+            Console.WriteLine("--- Оригінальний HTML ---");
+            Console.WriteLine(body.OuterHTML);
+
+            var textVisitor = new TextExtractionVisitor();
+            body.Accept(textVisitor);
+
+            Console.WriteLine("\n--- Чистий текст (TextExtractionVisitor) ---");
+            Console.WriteLine(textVisitor.GetPlainText());
+
+            var tagCounter = new TagCounterVisitor("li");
+            body.Accept(tagCounter);
+
+            Console.WriteLine("\n--- Аналітика (TagCounterVisitor) ---");
+            Console.WriteLine($"Кількість знайдених тегів <li>: {tagCounter.Count}");
 
             Console.WriteLine("\n" + new string('=', 60));
             Console.WriteLine("Демонстрацію завершено!");
