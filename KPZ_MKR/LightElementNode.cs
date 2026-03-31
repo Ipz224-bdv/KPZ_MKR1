@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace LightHTML_System
@@ -13,6 +14,9 @@ namespace LightHTML_System
         private readonly List<string> _cssClasses;
         private readonly List<LightNode> _children;
 
+        // --- ПАТЕРН СТАН (STATE) ---
+        private INodeState _state;
+
         public LightElementNode(string tagName, DisplayType display, ClosingType closing)
         {
             TagName = tagName;
@@ -20,19 +24,27 @@ namespace LightHTML_System
             Closing = closing;
             _cssClasses = new List<string>();
             _children = new List<LightNode>();
+
+            // За замовчуванням всі елементи у нормальному стані
+            _state = new NormalState();
         }
 
-        public void AddChild(LightNode node)
+        // Метод для зміни стану "на льоту"
+        public void SetState(INodeState state)
         {
-            _children.Add(node);
+            _state = state;
         }
+
+        public void AddChild(LightNode node) => _children.Add(node);
 
         public void AddCssClass(string cssClass)
         {
-            if (!_cssClasses.Contains(cssClass))
-            {
-                _cssClasses.Add(cssClass);
-            }
+            if (!_cssClasses.Contains(cssClass)) _cssClasses.Add(cssClass);
+        }
+
+        public void RemoveCssClass(string cssClass)
+        {
+            if (_cssClasses.Contains(cssClass)) _cssClasses.Remove(cssClass);
         }
 
         public int ChildrenCount => _children.Count;
@@ -41,10 +53,7 @@ namespace LightHTML_System
         {
             get
             {
-                if (Closing == ClosingType.Single)
-                {
-                    return string.Empty; // Одиничні теги не мають внутрішнього контенту
-                }
+                if (Closing == ClosingType.Single) return string.Empty;
 
                 var sb = new StringBuilder();
                 foreach (var child in _children)
@@ -59,6 +68,7 @@ namespace LightHTML_System
         {
             get
             {
+                // 1. Стандартна генерація HTML-структури
                 var sb = new StringBuilder();
                 sb.Append($"<{TagName}");
 
@@ -78,10 +88,15 @@ namespace LightHTML_System
                     sb.Append($"</{TagName}>");
                 }
 
-                return sb.ToString();
+                string standardHtml = sb.ToString();
+
+                // 2. ДЕЛЕГУВАННЯ СТАНУ (Паттерн State)
+                // Стан вирішує, чи модифікувати фінальний рядок (наприклад, додати підсвітку або приховати)
+                return _state.HandleRender(standardHtml);
             }
         }
-        // --- ПАТЕРН ІТЕРАТОР ---
+
+        // --- ПАТЕРН ІТЕРАТОР (ITERATOR) ---
 
         // 1. Обхід в глибину (Depth-First Search - DFS)
         public IEnumerable<LightNode> GetDepthFirstIterator()
@@ -118,7 +133,7 @@ namespace LightHTML_System
                 var current = queue.Dequeue();
                 yield return current;
 
-                // Якщо це елемент, додаємо його дітей в чергу
+                // Якщо це елемент, додаємо його дітей в чергу для подальшого опрацювання
                 if (current is LightElementNode elementNode)
                 {
                     foreach (var child in elementNode._children)
@@ -126,13 +141,6 @@ namespace LightHTML_System
                         queue.Enqueue(child);
                     }
                 }
-            }
-        }
-        public void RemoveCssClass(string cssClass)
-        {
-            if (_cssClasses.Contains(cssClass))
-            {
-                _cssClasses.Remove(cssClass);
             }
         }
     }
